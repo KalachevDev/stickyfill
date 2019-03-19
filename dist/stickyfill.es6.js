@@ -26,7 +26,8 @@ else {
             try {
                 testNode.style.position = prefix + 'sticky';
             }
-            catch(e) {}
+            catch (e) {
+            }
 
             return testNode.style.position != '';
         })
@@ -143,7 +144,7 @@ class Sticky {
          * 4. Get necessary node parameters
          */
         const referenceNode = node.parentNode;
-        const parentNode = shadowRootExists && referenceNode instanceof ShadowRoot? referenceNode.host: referenceNode;
+        const parentNode = shadowRootExists && referenceNode instanceof ShadowRoot ? referenceNode.host : referenceNode;
         const nodeWinOffset = node.getBoundingClientRect();
         const parentWinOffset = parentNode.getBoundingClientRect();
         const parentComputedStyle = getComputedStyle(parentNode);
@@ -231,7 +232,7 @@ class Sticky {
     _recalcPosition () {
         if (!this._active || this._removed) return;
 
-        const stickyMode = scroll.top <= this._limits.start? 'start': scroll.top >= this._limits.end? 'end': 'middle';
+        const stickyMode = scroll.top <= this._limits.start ? 'start' : scroll.top >= this._limits.end ? 'end' : 'middle';
 
         if (this._stickyMode == stickyMode) return;
 
@@ -454,6 +455,11 @@ function init () {
 
     isInitialized = true;
 
+    const requestAnimationFrame = window.requestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.msRequestAnimationFrame;
+
     // Watch for scroll position changes and trigger recalc/refresh if needed
     function checkScroll () {
         if (window.pageXOffset != scroll.left) {
@@ -469,10 +475,11 @@ function init () {
             // recalc position for all stickies
             stickies.forEach(sticky => sticky._recalcPosition());
         }
+
+        requestAnimationFrame(checkScroll);
     }
 
-    checkScroll();
-    window.addEventListener('scroll', checkScroll);
+    requestAnimationFrame(checkScroll);
 
     // Watch for window resizes and device orientation changes and trigger refresh
     window.addEventListener('resize', Stickyfill.refreshAll);
