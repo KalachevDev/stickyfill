@@ -288,7 +288,10 @@ class Sticky {
     _deactivate () {
         if (!this._active || this._removed) return;
 
-        this._clone.node.parentNode.removeChild(this._clone.node);
+        // In case this._clone.node has been unmounted, parentNode will be empty.
+        const parentNode = this._clone.node.parentNode;
+        parentNode && parentNode.removeChild(this._clone.node);
+
         delete this._clone;
 
         extend(this._node.style, this._styles);
